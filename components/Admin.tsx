@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SiteData, Project, TeamMember } from '../App';
+import { ImageUpload } from './ImageUpload';
 
 interface AdminProps {
   siteData: SiteData;
@@ -374,16 +375,11 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                           rows={4}
                         />
                       </div>
-                      <div>
-                        <label className={labelStyles}>Featured Image URL</label>
-                        <input 
-                          type="text" 
-                          value={project.img} 
-                          onChange={(e) => updateProject(project.id, 'img', e.target.value)}
-                          className={inputStyles}
-                          placeholder="https://example.com/image.jpg"
-                        />
-                      </div>
+                      <ImageUpload
+  currentImage={project.img}
+  onImageUpload={(url) => updateProject(project.id, 'img', url)}
+  label="Featured Image"
+/>
                       <div className="flex items-center justify-between pt-4 border-t border-white/5">
                         <button 
                           onClick={() => deleteProject(project.id, project.title)}
@@ -440,16 +436,11 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                           />
                         </div>
                       </div>
-                      <div>
-                        <label className={labelStyles}>Profile Picture URL</label>
-                        <input 
-                          type="text" 
-                          value={member.img} 
-                          onChange={(e) => updateTeamMember(member.id, 'img', e.target.value)}
-                          className={inputStyles}
-                          placeholder="https://example.com/avatar.jpg"
-                        />
-                      </div>
+                      <ImageUpload
+  currentImage={member.img}
+  onImageUpload={(url) => updateTeamMember(member.id, 'img', url)}
+  label="Profile Picture"
+/>
                       <div className="flex items-center justify-between pt-4 border-t border-white/5">
                         <button 
                           onClick={() => deleteTeamMember(member.id, member.name)}
