@@ -5,11 +5,13 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
+// Middleware - UPDATED CORS for Production
 app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-  }));
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://viukon.vercel.app', 'https://viukon.com', 'https://www.viukon.com']
+    : 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB Connection
@@ -27,7 +29,7 @@ const siteDataSchema = new mongoose.Schema({
     id: String,
     title: String,
     category: String,
-    description: String,  // ← ADD THIS LINE
+    description: String,
     img: String,
     tags: [String]
   }],
@@ -94,8 +96,13 @@ app.put('/api/sitedata', async (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

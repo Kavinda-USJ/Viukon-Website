@@ -90,17 +90,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       </label>
       
       {currentImage && (
-        <div className="relative w-full h-40 rounded-xl overflow-hidden border border-white/10 mb-3">
-          <img 
-            src={currentImage} 
-            alt="Current" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="text-white text-xs font-bold">Click below to change</span>
-          </div>
-        </div>
-      )}
+  <div className="relative w-full rounded-xl border border-white/10 mb-3 bg-brand-black/30 p-4">
+    <div className="flex items-center justify-center min-h-[160px]">
+      <img 
+        src={currentImage} 
+        alt="Current" 
+        className="max-w-full max-h-[200px] object-contain rounded-lg"
+      />
+    </div>
+    <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center rounded-xl">
+      <span className="text-white text-xs font-bold opacity-0 hover:opacity-100 transition-opacity">
+        Click below to change
+      </span>
+    </div>
+  </div>
+)}
 
       <button
         type="button"

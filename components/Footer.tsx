@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
               <li><button onClick={() => setPage('about')} className="hover:text-brand-yellow transition-colors">About Viukon</button></li>
               <li><button onClick={() => setPage('services')} className="hover:text-brand-yellow transition-colors">Core Services</button></li>
               <li><button onClick={() => setPage('team')} className="hover:text-brand-yellow transition-colors">Team</button></li>
-              <li><button onClick={() => setPage('admin')} className="text-brand-yellow/50 hover:text-brand-yellow transition-colors">Dashboard</button></li>
+             
             </ul>
           </div>
           
