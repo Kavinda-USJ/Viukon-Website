@@ -5,11 +5,9 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware - UPDATED CORS for Production
+// Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://viukon.vercel.app', 'https://viukon.com', 'https://www.viukon.com']
-    : 'http://localhost:3000',
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
@@ -94,11 +92,6 @@ app.put('/api/sitedata', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
 });
 
 // Start Server
