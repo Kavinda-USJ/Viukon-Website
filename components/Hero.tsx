@@ -11,6 +11,7 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
   const [wordIndex, setWordIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: 50, y: 50 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,6 +30,11 @@ export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
       const y = ((clientY - top) / height - 0.5) * 2;
       
       setMousePos({ x, y });
+      
+      // Calculate percentage position for grid effect
+      const percentX = ((clientX - left) / width) * 100;
+      const percentY = ((clientY - top) / height) * 100;
+      setCursorPos({ x: percentX, y: percentY });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -44,6 +50,33 @@ export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
       className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden w-full bg-brand-black"
       style={{ perspective: '1200px' }}
     >
+      {/* Interactive Grid Overlay */}
+      <div 
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          maskImage: `radial-gradient(circle 300px at ${cursorPos.x}% ${cursorPos.y}%, rgba(0,0,0,0.8) 0%, transparent 100%)`,
+          WebkitMaskImage: `radial-gradient(circle 300px at ${cursorPos.x}% ${cursorPos.y}%, rgba(0,0,0,0.8) 0%, transparent 100%)`
+        }}
+      >
+        <div 
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            maskImage: `radial-gradient(circle 150px at ${cursorPos.x}% ${cursorPos.y}%, rgba(0,0,0,1) 0%, transparent 100%)`,
+            WebkitMaskImage: `radial-gradient(circle 150px at ${cursorPos.x}% ${cursorPos.y}%, rgba(0,0,0,1) 0%, transparent 100%)`
+          }}
+        />
+      </div>
+
       <div 
         className="absolute inset-0 z-0 pointer-events-none transition-transform duration-700 ease-out"
         style={{
