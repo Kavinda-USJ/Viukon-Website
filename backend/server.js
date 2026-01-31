@@ -29,7 +29,9 @@ const siteDataSchema = new mongoose.Schema({
     category: String,
     description: String,
     img: String,
-    tags: [String]
+    tags: [String],
+    link: String,
+    featured: { type: Boolean, default: false }
   }],
   team: [{
     id: String,
@@ -40,13 +42,43 @@ const siteDataSchema = new mongoose.Schema({
   contact: {
     email: String,
     address: String
+  },
+  // ✅ ADDED: Trusted Brands
+  trustedBrands: {
+    type: [String],
+    default: [
+      'FINTECH',
+      'SNAP PAY',
+      'IMOS',
+      'MOE MEDIA',
+      'SWC GLOBAL',
+      'DFIT LABS',
+      'VORTEX AI',
+      'APEX SYSTEMS'
+    ]
+  },
+  // ✅ ADDED: Stats
+  stats: {
+    projects: { type: Number, default: 150 },
+    clients: { type: Number, default: 85 },
+    engagement: { type: Number, default: 25000 }
+  },
+  // ✅ ADDED: About Page Data
+  about: {
+    yearsExperience: { type: Number, default: 5 },
+    partnerPrograms: { type: Number, default: 12 },
+    teamImage: { 
+      type: String, 
+      default: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200' 
+    }
   }
 }, { timestamps: true });
 
 const SiteData = mongoose.model('SiteData', siteDataSchema);
 
-// API Routes
-// GET - Fetch all site data
+// ================= API ROUTES =================
+
+// GET - Fetch site data
 app.get('/api/sitedata', async (req, res) => {
   try {
     let data = await SiteData.findOne();
@@ -55,15 +87,16 @@ app.get('/api/sitedata', async (req, res) => {
     if (!data) {
       data = await SiteData.create({
         hero: {
-          title: "WE CREATE DIGITAL",
-          carouselWords: ["EXPERIENCES", "SOLUTIONS", "BRANDS", "INNOVATIONS"]
+          title: "ENGINEERING",
+          carouselWords: ["FUTURE SCALE", "BRAND GROWTH", "DIGITAL IMPACT", "DATA VISION", "CREATIVE ROI"]
         },
         projects: [],
         team: [],
         contact: {
           email: "hello@viukon.com",
-          address: "123 Creative Street, Design City"
+          address: "32 Curzon St, London"
         }
+        // trustedBrands, stats, and about auto-filled by defaults
       });
     }
     
@@ -85,6 +118,10 @@ app.put('/api/sitedata', async (req, res) => {
       data.projects = req.body.projects;
       data.team = req.body.team;
       data.contact = req.body.contact;
+      data.trustedBrands = req.body.trustedBrands;
+      data.stats = req.body.stats;
+      data.about = req.body.about; // ✅ ADDED: Save about data
+      
       await data.save();
     }
     

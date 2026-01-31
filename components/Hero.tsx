@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
 interface HeroProps {
@@ -6,9 +5,10 @@ interface HeroProps {
     title: string;
     carouselWords: string[];
   };
+  setPage: (page: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ data }) => {
+export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
   const [wordIndex, setWordIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({ data }) => {
               <span className="text-[10px] md:text-[11px] font-black text-white/60 tracking-[0.5em] uppercase">Viukon Excellence</span>
             </div>
             
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[130px] font-black leading-[0.85] tracking-[-0.07em] text-white flex flex-col items-center select-none">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[100px] font-black leading-[0.85] tracking-[-0.07em] text-white flex flex-col items-center select-none">
               <div className="reveal-wrapper">
                 <span className="reveal-text animate-reveal-text opacity-90">{data.title}</span>
               </div>
@@ -86,11 +86,17 @@ export const Hero: React.FC<HeroProps> = ({ data }) => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 pt-6 animate-fade-up" style={{ animationDelay: '0.6s' }}>
-            <button className="glass-button-yellow px-14 py-6 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-brand-yellow hover:text-brand-black transition-all hover:scale-110 active:scale-95 border border-brand-yellow/30 shadow-[0_0_50px_rgba(234,179,8,0.2)] group">
+            <button 
+              onClick={() => setPage('contact')}
+              className="glass-button-yellow px-14 py-6 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-brand-yellow hover:text-brand-black transition-all hover:scale-110 active:scale-95 border border-brand-yellow/30 shadow-[0_0_50px_rgba(234,179,8,0.2)] group"
+            >
               Start Project
               <span className="inline-block ml-3 group-hover:translate-x-2 transition-transform">→</span>
             </button>
-            <button className="px-14 py-6 bg-white/5 text-white/70 rounded-full font-black text-sm uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all">
+            <button 
+              onClick={() => setPage('about')}
+              className="px-14 py-6 bg-white/5 text-white/70 rounded-full font-black text-sm uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all"
+            >
               Our Vision
             </button>
           </div>

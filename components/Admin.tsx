@@ -17,7 +17,7 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'hero' | 'projects' | 'team' | 'contact'>('hero');
+  const [activeTab, setActiveTab] = useState<'home' | 'projects' | 'team' | 'contact' | 'about'>('home');
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editingMember, setEditingMember] = useState<string | null>(null);
@@ -38,15 +38,12 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
     }
   };
 
+  // Hero Section
   const handleHeroTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSiteData(prev => ({
       ...prev,
       hero: { ...prev.hero, title: e.target.value }
     }));
-  };
-
-  const saveHeroChanges = () => {
-    showNotification('success', 'Hero section saved successfully');
   };
 
   const handleCarouselWordChange = (index: number, value: string) => {
@@ -58,6 +55,59 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
     }));
   };
 
+  // Trusted By Brands
+  const handleBrandChange = (index: number, value: string) => {
+    const currentBrands = siteData.trustedBrands || [];
+    const newBrands = [...currentBrands];
+    newBrands[index] = value;
+    setSiteData(prev => ({
+      ...prev,
+      trustedBrands: newBrands
+    }));
+  };
+
+  const addBrand = () => {
+    const currentBrands = siteData.trustedBrands || [];
+    setSiteData(prev => ({
+      ...prev,
+      trustedBrands: [...currentBrands, 'NEW BRAND']
+    }));
+    showNotification('success', 'New brand added');
+  };
+
+  const deleteBrand = (index: number) => {
+    if (window.confirm('Are you sure you want to delete this brand?')) {
+      const currentBrands = siteData.trustedBrands || [];
+      setSiteData(prev => ({
+        ...prev,
+        trustedBrands: currentBrands.filter((_, i) => i !== index)
+      }));
+      showNotification('success', 'Brand deleted');
+    }
+  };
+
+  // Stats Section - FIXED to allow empty values, remove leading zeros, and proper updates
+  const handleStatsChange = (field: 'projects' | 'clients' | 'engagement', value: string) => {
+    // Only allow digits
+    const digitsOnly = value.replace(/\D/g, '');
+    
+    // Convert to number - empty string becomes 0
+    const numValue = digitsOnly === '' ? 0 : parseInt(digitsOnly, 10);
+    
+    setSiteData(prev => ({
+      ...prev,
+      stats: {
+        ...(prev.stats || { projects: 150, clients: 85, engagement: 25000 }),
+        [field]: numValue
+      }
+    }));
+  };
+
+  const saveHomePageChanges = () => {
+    showNotification('success', 'Home page settings saved successfully');
+  };
+
+  // Contact
   const handleContactChange = (field: 'email' | 'address', value: string) => {
     setSiteData(prev => ({
       ...prev,
@@ -69,6 +119,22 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
     showNotification('success', 'Contact information saved successfully');
   };
 
+  // About Page
+  const handleAboutChange = (field: 'yearsExperience' | 'partnerPrograms' | 'teamImage', value: string | number) => {
+    setSiteData(prev => ({
+      ...prev,
+      about: {
+        ...(prev.about || { yearsExperience: 5, partnerPrograms: 12, teamImage: '' }),
+        [field]: value
+      }
+    }));
+  };
+
+  const saveAboutChanges = () => {
+    showNotification('success', 'About page settings saved successfully');
+  };
+
+  // Projects
   const addProject = () => {
     const newProject: ExtendedProject = {
       id: Date.now().toString(),
@@ -105,6 +171,7 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
     }
   };
 
+  // Team
   const addTeamMember = () => {
     const newMember: TeamMember = {
       id: Date.now().toString(),
@@ -267,7 +334,8 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
           {/* Navigation Sidebar */}
           <aside className="lg:col-span-1 space-y-2">
             {[
-              { id: 'hero', label: 'Hero Section', icon: '🎯' },
+              { id: 'home', label: 'Home Page', icon: '🏠' },
+              { id: 'about', label: 'About Page', icon: '📖' },
               { id: 'projects', label: 'Projects', icon: '💼' },
               { id: 'team', label: 'Team', icon: '👥' },
               { id: 'contact', label: 'Contact', icon: '📧' }
@@ -289,12 +357,17 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
 
           {/* Editor Area */}
           <main className="lg:col-span-4 bg-white/5 border border-white/10 rounded-[32px] p-8 md:p-10 backdrop-blur-xl">
-            {activeTab === 'hero' && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+            
+            {/* HOME PAGE TAB */}
+            {activeTab === 'home' && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-black">Hero Section</h3>
+                  <h3 className="text-2xl font-black">Home Page Settings</h3>
                 </div>
-                <div className="space-y-6">
+
+                {/* Hero Section */}
+                <div className="space-y-6 p-6 bg-brand-black/20 border border-white/5 rounded-2xl">
+                  <h4 className="text-lg font-black text-brand-yellow">🎯 Hero Section</h4>
                   <div>
                     <label className={labelStyles}>Main Headline</label>
                     <input 
@@ -320,15 +393,163 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                       ))}
                     </div>
                   </div>
+                </div>
+
+                {/* Trusted By Brands */}
+                <div className="space-y-6 p-6 bg-brand-black/20 border border-white/5 rounded-2xl">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-black text-brand-yellow">🏢 Trusted By Brands</h4>
+                    <button 
+                      onClick={addBrand}
+                      className="px-4 py-2 bg-brand-yellow/10 border border-brand-yellow/20 text-brand-yellow text-xs font-bold uppercase tracking-wider hover:bg-brand-yellow/20 rounded-xl transition-all"
+                    >
+                      + Add Brand
+                    </button>
+                  </div>
+                  <div className="grid gap-3">
+                    {(siteData.trustedBrands && siteData.trustedBrands.length > 0) ? (
+                      siteData.trustedBrands.map((brand, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <input 
+                            type="text" 
+                            value={brand} 
+                            onChange={(e) => handleBrandChange(index, e.target.value)}
+                            className={inputStyles}
+                            placeholder="BRAND NAME"
+                          />
+                          <button 
+                            onClick={() => deleteBrand(index)}
+                            className="px-4 py-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl hover:bg-red-500/20 transition-all flex-shrink-0"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-white/40 text-sm text-center py-4">No brands yet. Click "Add Brand" to get started.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats Section */}
+                <div className="space-y-6 p-6 bg-brand-black/20 border border-white/5 rounded-2xl">
+                  <h4 className="text-lg font-black text-brand-yellow">📊 Stats Counter</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                      <label className={labelStyles}>Projects Completed</label>
+                      <input 
+                        type="text" 
+                        value={siteData.stats?.projects === 0 ? '' : siteData.stats?.projects || ''} 
+                        onChange={(e) => handleStatsChange('projects', e.target.value)}
+                        className={inputStyles}
+                        placeholder="150"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelStyles}>Happy Clients</label>
+                      <input 
+                        type="text" 
+                        value={siteData.stats?.clients === 0 ? '' : siteData.stats?.clients || ''} 
+                        onChange={(e) => handleStatsChange('clients', e.target.value)}
+                        className={inputStyles}
+                        placeholder="85"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelStyles}>Total Engagement</label>
+                      <input 
+                        type="text" 
+                        value={siteData.stats?.engagement === 0 ? '' : siteData.stats?.engagement || ''} 
+                        onChange={(e) => handleStatsChange('engagement', e.target.value)}
+                        className={inputStyles}
+                        placeholder="25000"
+                      />
+                      <p className="text-[10px] text-white/30 mt-1 ml-1">
+                        Will display as {siteData.stats?.engagement ? ((siteData.stats.engagement / 1000).toFixed(0) + 'K+') : '0K+'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex justify-end pt-4 border-t border-white/5">
+                  <button onClick={saveHomePageChanges} className={saveBtnStyles}>
+                    Save Home Page Changes
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ABOUT PAGE TAB */}
+            {activeTab === 'about' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-black">About Page Settings</h3>
+                </div>
+                
+                <div className="space-y-6">
+                  {/* Years of Experience */}
+                  <div className="p-6 bg-brand-black/20 border border-white/5 rounded-2xl space-y-4">
+                    <h4 className="text-lg font-black text-brand-yellow">📅 Years of Experience</h4>
+                    <div>
+                      <label className={labelStyles}>Years in Business</label>
+                      <input 
+                        type="text" 
+                        value={siteData.about?.yearsExperience === 0 ? '' : siteData.about?.yearsExperience || ''} 
+                        onChange={(e) => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '');
+                          const numValue = digitsOnly === '' ? 0 : parseInt(digitsOnly, 10);
+                          handleAboutChange('yearsExperience', numValue);
+                        }}
+                        className={inputStyles}
+                        placeholder="5"
+                      />
+                      <p className="text-[10px] text-white/30 mt-1 ml-1">This will be displayed on the About page</p>
+                    </div>
+                  </div>
+
+                  {/* Partner Programs */}
+                  <div className="p-6 bg-brand-black/20 border border-white/5 rounded-2xl space-y-4">
+                    <h4 className="text-lg font-black text-brand-yellow">🤝 Partner Programs</h4>
+                    <div>
+                      <label className={labelStyles}>Number of Partner Programs</label>
+                      <input 
+                        type="text" 
+                        value={siteData.about?.partnerPrograms === 0 ? '' : siteData.about?.partnerPrograms || ''} 
+                        onChange={(e) => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '');
+                          const numValue = digitsOnly === '' ? 0 : parseInt(digitsOnly, 10);
+                          handleAboutChange('partnerPrograms', numValue);
+                        }}
+                        className={inputStyles}
+                        placeholder="12"
+                      />
+                      <p className="text-[10px] text-white/30 mt-1 ml-1">Total active partnership programs</p>
+                    </div>
+                  </div>
+
+                  {/* Team Image */}
+                  <div className="p-6 bg-brand-black/20 border border-white/5 rounded-2xl space-y-4">
+                    <h4 className="text-lg font-black text-brand-yellow">📸 Viukon Team Picture</h4>
+                    <ImageUpload
+                      currentImage={siteData.about?.teamImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200'}
+                      onImageUpload={(url) => handleAboutChange('teamImage', url)}
+                      label="Team Photo (Recommended: 1200x600px)"
+                    />
+                    <p className="text-[10px] text-white/30 mt-1 ml-1">Upload a professional team photo for the About page</p>
+                  </div>
+
+                  {/* Save Button */}
                   <div className="flex justify-end pt-4 border-t border-white/5">
-                    <button onClick={saveHeroChanges} className={saveBtnStyles}>
-                      Save Changes
+                    <button onClick={saveAboutChanges} className={saveBtnStyles}>
+                      Save About Page Changes
                     </button>
                   </div>
                 </div>
               </div>
             )}
 
+            {/* PROJECTS TAB */}
             {activeTab === 'projects' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex items-center justify-between">
@@ -343,6 +564,34 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                 <div className="grid gap-6">
                   {siteData.projects.map((project: ExtendedProject) => (
                     <div key={project.id} className="p-6 bg-brand-black/30 border border-white/10 rounded-2xl space-y-5 hover:border-white/20 transition-all">
+                      
+                      {/* Featured Toggle */}
+                      <div className="flex items-center justify-between p-4 bg-brand-yellow/5 border border-brand-yellow/20 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <svg className="w-5 h-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                          <div>
+                            <p className="text-white font-bold text-sm">Featured on Homepage</p>
+                            <p className="text-white/40 text-[10px] font-bold uppercase tracking-wider">
+                              {project.featured ? 'Showing on home page' : 'Only in portfolio page'}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => updateProject(project.id, 'featured', !project.featured)}
+                          className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                            project.featured ? 'bg-brand-yellow' : 'bg-white/10'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                              project.featured ? 'translate-x-7' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                           <label className={labelStyles}>Project Title</label>
@@ -375,11 +624,22 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                           rows={4}
                         />
                       </div>
+                      <div>
+                        <label className={labelStyles}>Project Link (URL)</label>
+                        <input 
+                          type="url" 
+                          value={project.link || ''} 
+                          onChange={(e) => updateProject(project.id, 'link', e.target.value)}
+                          className={inputStyles}
+                          placeholder="https://example.com or https://project-demo.com"
+                        />
+                        <p className="text-[10px] text-white/30 mt-1 ml-1">Users will be redirected here when clicking the arrow button</p>
+                      </div>
                       <ImageUpload
-  currentImage={project.img}
-  onImageUpload={(url) => updateProject(project.id, 'img', url)}
-  label="Featured Image"
-/>
+                        currentImage={project.img}
+                        onImageUpload={(url) => updateProject(project.id, 'img', url)}
+                        label="Featured Image"
+                      />
                       <div className="flex items-center justify-between pt-4 border-t border-white/5">
                         <button 
                           onClick={() => deleteProject(project.id, project.title)}
@@ -400,6 +660,7 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
               </div>
             )}
 
+            {/* TEAM TAB */}
             {activeTab === 'team' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex items-center justify-between">
@@ -437,10 +698,10 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                         </div>
                       </div>
                       <ImageUpload
-  currentImage={member.img}
-  onImageUpload={(url) => updateTeamMember(member.id, 'img', url)}
-  label="Profile Picture"
-/>
+                        currentImage={member.img}
+                        onImageUpload={(url) => updateTeamMember(member.id, 'img', url)}
+                        label="Profile Picture"
+                      />
                       <div className="flex items-center justify-between pt-4 border-t border-white/5">
                         <button 
                           onClick={() => deleteTeamMember(member.id, member.name)}
@@ -461,6 +722,7 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
               </div>
             )}
 
+            {/* CONTACT TAB */}
             {activeTab === 'contact' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex items-center justify-between">

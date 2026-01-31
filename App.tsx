@@ -23,6 +23,8 @@ export interface Project {
   description?: string;
   img: string;
   tags: string[];
+  link?: string;
+  featured?: boolean;
 }
 
 export interface TeamMember {
@@ -37,12 +39,23 @@ export interface SiteData {
     title: string;
     carouselWords: string[];
   };
+  projects: Project[];
+  team: TeamMember[];
   contact: {
     email: string;
     address: string;
   };
-  projects: Project[];
-  team: TeamMember[];
+  trustedBrands?: string[];
+  stats?: {
+    projects: number;
+    clients: number;
+    engagement: number;
+  };
+  about?: {
+    yearsExperience: number;
+    partnerPrograms: number;
+    teamImage: string;
+  };
 }
 
 const initialData: SiteData = {
@@ -67,7 +80,23 @@ const initialData: SiteData = {
     { id: '4', name: 'Elena Rodriguez', role: 'Operations Lead', img: 'https://i.pravatar.cc/400?u=elena' },
     { id: '5', name: 'David Park', role: 'Data Scientist', img: 'https://i.pravatar.cc/400?u=david' },
     { id: '6', name: 'Sophia Miller', role: 'Client Relations', img: 'https://i.pravatar.cc/400?u=sophia' }
-  ]
+  ],
+  trustedBrands: [
+    'FINTECH', 'SNAP PAY', 'IMOS', 'MOE MEDIA', 'SWC GLOBAL', 
+    'DFIT LABS', 'VORTEX AI', 'APEX SYSTEMS',
+    'FINTECH', 'SNAP PAY', 'IMOS', 'MOE MEDIA', 'SWC GLOBAL', 
+    'DFIT LABS', 'VORTEX AI', 'APEX SYSTEMS'
+  ],
+  stats: {
+    projects: 150,
+    clients: 85,
+    engagement: 25000
+  },
+  about: {
+    yearsExperience: 5,
+    partnerPrograms: 12,
+    teamImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200'
+  }
 };
 
 const App: React.FC = () => {
@@ -138,22 +167,22 @@ const App: React.FC = () => {
       case 'home':
         return (
           <div className="animate-in fade-in duration-700 overflow-x-hidden w-full">
-            <Hero data={siteData.hero} />
-            <TrustedBy />
+            <Hero data={siteData.hero} setPage={setCurrentPage} />
+            <TrustedBy brands={siteData.trustedBrands || []} />
             <Features />
             <FeaturedWorks works={siteData.projects} />
             <FAQ />
-            <Stats />
+            <Stats stats={siteData.stats || { projects: 150, clients: 85, engagement: 25000 }} />
             <ContactCTA setPage={setCurrentPage} contact={siteData.contact} />
           </div>
         );
       case 'about':
-        return <About />;
+        return <About aboutData={siteData.about || { yearsExperience: 5, partnerPrograms: 12, teamImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200' }} />;
       case 'services':
         return (
           <div className="animate-in fade-in duration-700 overflow-x-hidden w-full">
             <Features />
-            <Stats />
+            <Stats stats={siteData.stats || { projects: 150, clients: 85, engagement: 25000 }} />
           </div>
         );
       case 'portfolio':
@@ -165,7 +194,7 @@ const App: React.FC = () => {
       case 'admin':
         return <Admin siteData={siteData} setSiteData={setSiteData} />;
       default:
-        return <Hero data={siteData.hero} />;
+        return <Hero data={siteData.hero} setPage={setCurrentPage} />;
     }
   };
 
