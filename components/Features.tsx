@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const services = [
   {
@@ -29,12 +28,63 @@ const services = [
 ];
 
 export const Features: React.FC = () => {
+  const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = itemRefs.current.indexOf(entry.target as HTMLDivElement);
+          if (index !== -1 && !visibleItems.includes(index)) {
+            setVisibleItems((prev) => [...prev, index]);
+          }
+        }
+      });
+    }, observerOptions);
+
+    const headerObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setHeaderVisible(true);
+      }
+    }, observerOptions);
+
+    if (headerRef.current) {
+      headerObserver.observe(headerRef.current);
+    }
+
+    itemRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      itemRefs.current.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+      if (headerRef.current) {
+        headerObserver.unobserve(headerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <section className="py-32 bg-brand-black w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-3xl mx-auto mb-24 space-y-4 text-center">
-          <span className="text-brand-yellow font-black uppercase tracking-[0.4em] text-[10px] animate-fade-up">What we do</span>
-          <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter relative inline-block animate-fade-up" style={{ animationDelay: '0.2s' }}>
+        <div 
+          ref={headerRef}
+          className={`max-w-3xl mx-auto mb-24 space-y-4 text-center transition-all duration-1000 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}
+        >
+          <span className="text-brand-yellow font-black uppercase tracking-[0.4em] text-[10px]">What we do</span>
+          <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter relative inline-block">
             Featured <br />
             <span className="text-brand-yellow relative">
               Services
@@ -43,7 +93,7 @@ export const Features: React.FC = () => {
               </svg>
             </span>
           </h2>
-          <p className="text-white/40 text-lg mx-auto max-w-xl font-medium pt-4 animate-fade-up" style={{ animationDelay: '0.4s' }}>
+          <p className="text-white/40 text-lg mx-auto max-w-xl font-medium pt-4">
             We provide specialized digital solutions that integrate data intelligence with provocative creative strategies.
           </p>
         </div>
@@ -51,9 +101,14 @@ export const Features: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((item, index) => (
             <div 
-              key={item.num} 
-              className="group p-10 bg-white/5 rounded-[2.5rem] border border-white/5 hover:border-brand-yellow/30 transition-all duration-500 hover:-translate-y-2 animate-fade-up"
-              style={{ animationDelay: `${0.6 + (index * 0.1)}s` }}
+              key={item.num}
+              ref={(el) => (itemRefs.current[index] = el)}
+              className={`group p-10 bg-white/5 rounded-[2.5rem] border border-white/5 hover:border-brand-yellow/30 transition-all duration-700 hover:-translate-y-2 ${
+                visibleItems.includes(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+              }`}
+              style={{ 
+                transitionDelay: visibleItems.includes(index) ? `${index * 150}ms` : '0ms'
+              }}
             >
               <div className="flex justify-between items-start mb-16">
                 <span className="text-5xl font-black text-white/5 group-hover:text-brand-yellow/10 transition-colors">{item.num}</span>

@@ -71,10 +71,10 @@ export const About: React.FC<AboutProps> = ({ aboutData }) => {
           </div>
 
           <div className="relative">
-            <div className="aspect-square bg-brand-gray rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center">
+            <div className="aspect-square bg-brand-gray rounded-3xl overflow-hidden shadow-2xl">
               <img 
                 src={aboutData.teamImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200'} 
-                className="w-full h-full object-contain" 
+                className="w-full h-full object-cover" 
                 alt="Viukon Team"
               />
             </div>

@@ -16,11 +16,12 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
 
           {/* Brand */}
           <div className="lg:col-span-2 space-y-8">
-            <button onClick={() => setPage('home')} className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-brand-yellow rounded-xl flex items-center justify-center font-bold text-brand-black text-2xl group-hover:scale-110 transition-transform">
-                V
-              </div>
-              <span className="text-3xl font-black tracking-tighter text-white">viukon</span>
+            <button onClick={() => setPage('home')} className="group">
+              <img 
+                src="https://www.beautyof.cloud/viukon.png"
+                alt="Viukon"
+                className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+              />
             </button>
 
             <p className="text-white/40 max-w-sm leading-relaxed text-sm">

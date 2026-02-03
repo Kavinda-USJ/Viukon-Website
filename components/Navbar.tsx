@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import viukonLogo from './assets/viukon-logo.png';
 
 interface NavbarProps {
   scrolled: boolean;
@@ -33,74 +34,94 @@ export const Navbar: React.FC<NavbarProps> = ({ scrolled, currentPage, setPage }
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 px-6 py-4 ${
-        scrolled 
-          ? (isLightMode ? 'bg-white/80 border-b border-black/5' : 'bg-brand-black/80 border-b border-white/10') 
-          : 'bg-transparent'
-      } backdrop-blur-md`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <button 
-            onClick={() => setPage('home')}
-            className="group z-[70]"
-          >
-            <img 
-              src="https://www.beautyof.cloud/viukon.png"
-              alt="Viukon"
-              className="h-8 md:h-10 w-auto object-contain group-hover:scale-105 transition-transform"
-            />
-          </button>
+        isMobileMenuOpen 
+          ? 'bg-brand-yellow md:bg-brand-black/80 border-b-0 md:border-b md:border-white/10'
+          : (scrolled || isLightMode)
+            ? (isLightMode ? 'bg-brand-black/60 border-b border-white/10' : 'bg-brand-black/80 border-b border-white/10') 
+            : 'bg-transparent'
+      } ${isMobileMenuOpen ? '' : 'backdrop-blur-md'}`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between">
+            {/* Logo - Left Side */}
+            <button 
+              onClick={() => setPage('home')}
+              className="group z-[70]"
+            >
+              <img 
+                src={viukonLogo}
+                alt="Viukon"
+                className="h-8 md:h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+                style={isMobileMenuOpen ? { filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 12px rgba(0, 0, 0, 0.4))' } : {}}
+              />
+            </button>
 
-          <div className={`hidden md:flex items-center gap-8 text-sm font-bold tracking-tight uppercase text-[11px]`}>
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setPage(item.id)}
-                className={`transition-all relative py-1 ${
-                  currentPage === item.id 
-                    ? 'text-brand-yellow' 
-                    : (isLightMode ? 'text-brand-black/40 hover:text-brand-black' : 'text-white/40 hover:text-white')
-                }`}
+            {/* Desktop Navigation - Center */}
+            <div className="hidden md:flex items-center gap-8 text-sm font-bold tracking-tight uppercase text-[11px] absolute left-1/2 transform -translate-x-1/2">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setPage(item.id)}
+                  className={`transition-all relative py-1 whitespace-nowrap ${
+                    currentPage === item.id 
+                      ? 'text-brand-yellow' 
+                      : 'text-white/40 hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                  {currentPage === item.id && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-yellow rounded-full"></span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Right Side - CTA and Mobile Menu */}
+            <div className="flex items-center gap-4 z-[70]">
+              <button 
+                onClick={() => setPage('contact')}
+                className="hidden sm:flex glass-button-yellow hover:bg-brand-yellow/20 text-brand-yellow px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest items-center gap-2 transition-all group border-brand-yellow/20"
               >
-                {item.label}
-                {currentPage === item.id && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-yellow rounded-full"></span>
-                )}
+                Let's Talk
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </button>
-            ))}
-          </div>
 
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setPage('contact')}
-              className="hidden sm:flex glass-button-yellow hover:bg-brand-yellow/20 text-brand-yellow px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest items-center gap-2 transition-all group border-brand-yellow/20 z-[70]"
-            >
-              Let's Talk
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </button>
-
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 z-[70] transition-colors ${
-                isMobileMenuOpen ? 'text-brand-black' : (isLightMode ? 'text-brand-black' : 'text-white')
-              }`}
-              aria-label="Toggle Menu"
-            >
-              <span className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-              <span className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-            </button>
+              {/* Mobile Menu Button - Just Icon with Shadow */}
+              {/* Mobile Menu Button */}
+<button 
+  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+  className={`md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 transition-colors ${
+    isMobileMenuOpen ? 'text-brand-black' : 'text-white'
+  }`}
+  aria-label="Toggle Menu"
+>
+  <span 
+    className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}
+    style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.8)' }}
+  ></span>
+  <span 
+    className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}
+    style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.8)' }}
+  ></span>
+  <span 
+    className={`w-6 h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}
+    style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.8)' }}
+  ></span>
+</button>
+            </div>
           </div>
         </div>
       </nav>
 
+      {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-[55] md:hidden transition-all duration-500 ease-in-out ${
         isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}>
-        <div className="absolute inset-0 bg-brand-yellow animate-in fade-in zoom-in duration-300"></div>
+        <div className="absolute inset-0 bg-brand-yellow"></div>
         <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-white/10 blur-[100px] pointer-events-none"></div>
 
-        <div className="relative h-full flex flex-col justify-center px-10 gap-8">
+        <div className="relative h-full flex flex-col justify-center px-10 gap-8 pt-20">
           {navItems.map((item, index) => (
             <button
               key={item.id}
