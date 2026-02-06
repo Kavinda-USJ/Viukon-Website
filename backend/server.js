@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -12,127 +12,128 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected Successfully!'))
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+// MySQL Connection Pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: process.env.DB_PORT || 8889,         
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'root',
+  database: process.env.DB_NAME || 'viukon_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
-// Define Schema
-const siteDataSchema = new mongoose.Schema({
-  hero: {
-    title: String,
-    carouselWords: [String]
-  },
-  projects: [{
-    id: String,
-    title: String,
-    category: String,
-    description: String,
-    img: String,
-    tags: [String],
-    link: String,
-    featured: { type: Boolean, default: false }
-  }],
-  team: [{
-    id: String,
-    name: String,
-    role: String,
-    img: String
-  }],
-  contact: {
-    email: String,
-    address: String
-  },
-  // ✅ ADDED: Trusted Brands
-  trustedBrands: {
-    type: [String],
-    default: [
-      'FINTECH',
-      'SNAP PAY',
-      'IMOS',
-      'MOE MEDIA',
-      'SWC GLOBAL',
-      'DFIT LABS',
-      'VORTEX AI',
-      'APEX SYSTEMS'
-    ]
-  },
-  // ✅ ADDED: Stats
-  stats: {
-    projects: { type: Number, default: 150 },
-    clients: { type: Number, default: 85 },
-    engagement: { type: Number, default: 25000 }
-  },
-  // ✅ ADDED: About Page Data
-  about: {
-    yearsExperience: { type: Number, default: 5 },
-    partnerPrograms: { type: Number, default: 12 },
-    teamImage: { 
-      type: String, 
-      default: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200' 
+// Helper: Safely parse JSON only if it is a string
+const safeParse = (data) => {
+  if (typeof data === 'string') {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      return data;
     }
   }
-}, { timestamps: true });
-
-const SiteData = mongoose.model('SiteData', siteDataSchema);
+  return data; // Already an object or null
+};
 
 // ================= API ROUTES =================
 
-// GET - Fetch site data
 app.get('/api/sitedata', async (req, res) => {
   try {
-    let data = await SiteData.findOne();
-    
-    // If no data exists, create initial data
-    if (!data) {
-      data = await SiteData.create({
-        hero: {
-          title: "ENGINEERING",
-          carouselWords: ["FUTURE SCALE", "BRAND GROWTH", "DIGITAL IMPACT", "DATA VISION", "CREATIVE ROI"]
-        },
+    const [settingsRows] = await pool.query('SELECT * FROM site_settings WHERE id = 1');
+    const [projectRows] = await pool.query('SELECT * FROM projects ORDER BY id DESC');
+    const [teamRows] = await pool.query('SELECT * FROM team ORDER BY id DESC');
+
+    const settings = settingsRows[0];
+
+    if (!settings) {
+      return res.json({
+        hero: { title: "ENGINEERING", carouselWords: ["FUTURE SCALE", "BRAND GROWTH"] },
         projects: [],
         team: [],
-        contact: {
-          email: "hello@viukon.com",
-          address: "32 Curzon St, London"
-        }
-        // trustedBrands, stats, and about auto-filled by defaults
+        contact: { email: "hello@viukon.com", address: "London" },
+        trustedBrands: [],
+        stats: { projects: 0, clients: 0, engagement: 0 },
+        about: { yearsExperience: 0, partnerPrograms: 0, teamImage: '' }
       });
     }
-    
-    res.json(data);
+
+    // projects.tags is stored as JSON, mysql2 handles it
+    const formattedProjects = projectRows.map(p => ({
+      ...p,
+      tags: safeParse(p.tags),
+      featured: !!p.featured // Convert 1/0 to true/false
+    }));
+
+    res.json({
+      hero: safeParse(settings.hero),
+      projects: formattedProjects,
+      team: teamRows,
+      contact: safeParse(settings.contact),
+      trustedBrands: safeParse(settings.trustedBrands),
+      stats: safeParse(settings.stats),
+      about: safeParse(settings.about)
+    });
+
   } catch (error) {
+    console.error('🔥 Server GET Error:', error);
     res.status(500).json({ message: error.message });
   }
 });
 
-// PUT - Update site data
 app.put('/api/sitedata', async (req, res) => {
+  let connection;
   try {
-    let data = await SiteData.findOne();
-    
-    if (!data) {
-      data = await SiteData.create(req.body);
-    } else {
-      data.hero = req.body.hero;
-      data.projects = req.body.projects;
-      data.team = req.body.team;
-      data.contact = req.body.contact;
-      data.trustedBrands = req.body.trustedBrands;
-      data.stats = req.body.stats;
-      data.about = req.body.about; // ✅ ADDED: Save about data
-      
-      await data.save();
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const { hero, projects, team, contact, trustedBrands, stats, about } = req.body;
+
+    // 1. Update site_settings
+    await connection.query(
+      'UPDATE site_settings SET hero = ?, contact = ?, trustedBrands = ?, stats = ?, about = ? WHERE id = 1',
+      [
+        JSON.stringify(hero),
+        JSON.stringify(contact),
+        JSON.stringify(trustedBrands),
+        JSON.stringify(stats),
+        JSON.stringify(about)
+      ]
+    );
+
+    // 2. Sync Projects (Delete and Re-insert approach)
+    await connection.query('DELETE FROM projects');
+    if (projects && projects.length > 0) {
+      for (const p of projects) {
+        await connection.query(
+          'INSERT INTO projects (id, title, category, description, img, tags, link, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [p.id, p.title, p.category, p.description || '', p.img, JSON.stringify(p.tags || []), p.link || '', p.featured ? 1 : 0]
+        );
+      }
     }
-    
-    res.json({ message: 'Data updated successfully!', data });
+
+    // 3. Sync Team
+    await connection.query('DELETE FROM team');
+    if (team && team.length > 0) {
+      for (const m of team) {
+        await connection.query(
+          'INSERT INTO team (id, name, role, img) VALUES (?, ?, ?, ?)',
+          [m.id, m.name, m.role, m.img]
+        );
+      }
+    }
+
+    await connection.commit();
+    res.json({ message: 'Data updated successfully!' });
+
   } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('🔥 Server PUT Error:', error);
     res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) connection.release();
   }
 });
 
-// Start Server
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
