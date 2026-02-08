@@ -1,11 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface FooterProps {
-  setPage: (page: any) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ setPage }) => {
+export const Footer: React.FC = () => {
+  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
+
+  const handleNavigate = (path: string) => {
+    window.scrollTo(0, 0);
+    navigate(path);
+  };
 
   return (
     <footer className="bg-brand-black border-t border-white/5 pt-24 pb-12">
@@ -16,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
 
           {/* Brand */}
           <div className="lg:col-span-2 space-y-8">
-            <button onClick={() => setPage('home')} className="group">
+            <button onClick={() => handleNavigate('/')} className="group">
               <img 
                 src="https://www.beautyof.cloud/viukon.png"
                 alt="Viukon"
@@ -40,9 +43,9 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
           <div className="space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest">Company</h4>
             <ul className="space-y-4 text-sm text-white/40">
-              <li><button onClick={() => setPage('about')} className="hover:text-brand-yellow transition-colors">About Viukon</button></li>
-              <li><button onClick={() => setPage('services')} className="hover:text-brand-yellow transition-colors">Core Services</button></li>
-              <li><button onClick={() => setPage('team')} className="hover:text-brand-yellow transition-colors">Team</button></li>
+              <li><button onClick={() => handleNavigate('/about')} className="hover:text-brand-yellow transition-colors">About Viukon</button></li>
+              <li><button onClick={() => handleNavigate('/services')} className="hover:text-brand-yellow transition-colors">Core Services</button></li>
+              <li><button onClick={() => handleNavigate('/team')} className="hover:text-brand-yellow transition-colors">Team</button></li>
             </ul>
           </div>
 
@@ -50,8 +53,8 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
           <div className="space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest">Solutions</h4>
             <ul className="space-y-4 text-sm text-white/40">
-              <li><button onClick={() => setPage('portfolio')} className="hover:text-brand-yellow transition-colors">Portfolio</button></li>
-              <li><button onClick={() => setPage('services')} className="hover:text-brand-yellow transition-colors">Content Strategy</button></li>
+              <li><button onClick={() => handleNavigate('/portfolio')} className="hover:text-brand-yellow transition-colors">Portfolio</button></li>
+              <li><button onClick={() => handleNavigate('/services')} className="hover:text-brand-yellow transition-colors">Content Strategy</button></li>
             </ul>
           </div>
 
@@ -59,7 +62,7 @@ export const Footer: React.FC<FooterProps> = ({ setPage }) => {
           <div className="space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest">Support</h4>
             <ul className="space-y-4 text-sm text-white/40">
-              <li><button onClick={() => setPage('contact')} className="hover:text-brand-yellow transition-colors">Contact Support</button></li>
+              <li><button onClick={() => handleNavigate('/contact')} className="hover:text-brand-yellow transition-colors">Contact Support</button></li>
               <li><a href="#" className="hover:text-brand-yellow transition-colors">Privacy Policy</a></li>
             </ul>
           </div>

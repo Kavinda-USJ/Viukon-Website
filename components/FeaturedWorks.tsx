@@ -53,7 +53,7 @@ export const FeaturedWorks: React.FC<FeaturedWorksProps> = ({ works }) => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredWorks.map((work, index) => (
               <div 
                 key={work.id} 
@@ -61,27 +61,27 @@ export const FeaturedWorks: React.FC<FeaturedWorksProps> = ({ works }) => {
                 style={{ animationDelay: `${0.4 + (index * 0.2)}s` }}
               >
                 <div 
-                  className="aspect-[16/10] overflow-hidden rounded-3xl bg-white/5 border border-white/10 cursor-pointer"
+                  className="aspect-[3/4] overflow-hidden rounded-2xl bg-white/5 border border-white/10 cursor-pointer"
                   onClick={() => setSelectedProject(work)}
                 >
                   <img 
                     src={work.img} 
                     alt={work.title}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-1000"
                   />
                   <div className="absolute inset-0 bg-brand-yellow/0 group-hover:bg-brand-black/20 transition-colors pointer-events-none"></div>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-4">
                   <div className="flex justify-between items-start">
-                    <div className="space-y-2 flex-1">
+                    <div className="space-y-1 flex-1">
                       <div className="flex gap-2">
                         {work.tags?.map(tag => (
-                          <span key={tag} className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{tag}</span>
+                          <span key={tag} className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">{tag}</span>
                         ))}
                       </div>
-                      <h3 className="text-3xl font-black text-white group-hover:text-brand-yellow transition-colors">{work.title}</h3>
-                      <p className="text-sm text-white/40 font-bold uppercase tracking-widest">{work.category}</p>
+                      <h3 className="text-lg font-black text-white group-hover:text-brand-yellow transition-colors">{work.title}</h3>
+                      <p className="text-xs text-white/40 font-bold uppercase tracking-widest">{work.category}</p>
                     </div>
                     
                     {work.link ? (
@@ -90,10 +90,10 @@ export const FeaturedWorks: React.FC<FeaturedWorksProps> = ({ works }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-brand-yellow hover:text-brand-black hover:border-brand-yellow transition-all flex-shrink-0 group/btn"
+                        className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-brand-yellow hover:text-brand-black hover:border-brand-yellow transition-all flex-shrink-0 group/btn"
                       >
                         <svg 
-                          className="w-6 h-6 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" 
+                          className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" 
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
@@ -102,9 +102,9 @@ export const FeaturedWorks: React.FC<FeaturedWorksProps> = ({ works }) => {
                         </svg>
                       </a>
                     ) : (
-                      <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/40 transition-all flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 transition-all flex-shrink-0">
                         <svg 
-                          className="w-6 h-6" 
+                          className="w-4 h-4" 
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
