@@ -75,11 +75,11 @@ export const Features: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-32 bg-brand-black w-full overflow-hidden">
+    <section className="py-12 bg-brand-black w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div 
           ref={headerRef}
-          className={`max-w-3xl mx-auto mb-24 space-y-4 text-center transition-all duration-1000 ${
+          className={`max-w-3xl mx-auto mb-12 space-y-4 text-center transition-all duration-1000 ${
             headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >

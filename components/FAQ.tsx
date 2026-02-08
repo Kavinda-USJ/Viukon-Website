@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 const faqData = [
@@ -24,9 +23,9 @@ export const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="py-32 bg-brand-black relative overflow-hidden">
+    <section className="py-12 bg-brand-black relative overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-20 space-y-4">
+        <div className="text-center mb-12 space-y-4">
           <span className="text-brand-yellow font-black uppercase tracking-[0.4em] text-[10px]">Intelligence</span>
           <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter">
             Common <span className="text-brand-yellow relative">
@@ -57,7 +56,6 @@ export const FAQ: React.FC = () => {
                   </svg>
                 </span>
               </button>
-              
               <div 
                 className={`px-8 overflow-hidden transition-all duration-500 ease-in-out ${openIndex === index ? 'max-h-40 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}
               >
@@ -69,6 +67,17 @@ export const FAQ: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <style>{`
+        .animate-path {
+          stroke-dasharray: 200;
+          stroke-dashoffset: 200;
+          animation: draw-path 2s ease-out forwards;
+        }
+        @keyframes draw-path {
+          to { stroke-dashoffset: 0; }
+        }
+      `}</style>
     </section>
   );
 };

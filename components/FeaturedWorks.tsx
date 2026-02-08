@@ -39,9 +39,9 @@ export const FeaturedWorks: React.FC<FeaturedWorksProps> = ({ works }) => {
 
   return (
     <React.Fragment>
-      <section className="py-24 bg-brand-black w-full overflow-hidden">
+      <section className="py-12 bg-brand-black w-full overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20 space-y-4">
+          <div className="text-center mb-12 space-y-4">
             <span className="text-brand-yellow font-black uppercase tracking-[0.4em] text-[10px] animate-fade-up">Recent Works</span>
             <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter inline-block relative animate-fade-up" style={{ animationDelay: '0.2s' }}>
               Featured <span className="text-brand-yellow relative">

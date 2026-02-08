@@ -10,11 +10,11 @@ interface StatsProps {
 
 export const Stats: React.FC<StatsProps> = ({ stats }) => {
   return (
-    <section className="py-24 bg-brand-black border-y border-white/5 relative overflow-hidden">
+    <section className="py-12 bg-brand-black border-y border-white/5 relative overflow-hidden">
       <div className="absolute inset-0 bg-brand-yellow/5 blur-[120px] rounded-full translate-x-1/2 translate-y-1/2"></div>
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-20 space-y-6">
+        <div className="text-center mb-12 space-y-6">
           <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter">
             Making it <span className="text-brand-yellow relative">
               Real

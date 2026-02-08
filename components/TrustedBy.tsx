@@ -9,8 +9,8 @@ export const TrustedBy: React.FC<TrustedByProps> = ({ brands }) => {
   const displayBrands = [...brands, ...brands];
 
   return (
-    <section className="py-16 border-y border-white/5 bg-brand-black/50 overflow-hidden group">
-      <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
+    <section className="py-8 border-y border-white/5 bg-brand-black/50 overflow-hidden group">
+      <div className="max-w-7xl mx-auto px-6 mb-4 text-center">
         <p className="text-[10px] font-black tracking-[0.4em] text-white/30 uppercase animate-fade-up">
           Trusted by Industry Leaders
         </p>

@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroProps {
   data: {
     title: string;
     carouselWords: string[];
   };
-  setPage: (page: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
+export const Hero: React.FC<HeroProps> = ({ data }) => {
+  const navigate = useNavigate();
   const [wordIndex, setWordIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [cursorPos, setCursorPos] = useState({ x: 50, y: 50 });
@@ -120,14 +121,14 @@ export const Hero: React.FC<HeroProps> = ({ data, setPage }) => {
 
           <div className="flex flex-wrap items-center justify-center gap-6 pt-6 animate-fade-up" style={{ animationDelay: '0.6s' }}>
             <button 
-              onClick={() => setPage('contact')}
+              onClick={() => navigate('/contact')}
               className="glass-button-yellow px-14 py-6 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-brand-yellow hover:text-brand-black transition-all hover:scale-110 active:scale-95 border border-brand-yellow/30 shadow-[0_0_50px_rgba(234,179,8,0.2)] group"
             >
               Start Project
               <span className="inline-block ml-3 group-hover:translate-x-2 transition-transform">→</span>
             </button>
             <button 
-              onClick={() => setPage('about')}
+              onClick={() => navigate('/about')}
               className="px-14 py-6 bg-white/5 text-white/70 rounded-full font-black text-sm uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all"
             >
               Our Vision

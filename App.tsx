@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { TrustedBy } from './components/TrustedBy';
@@ -13,8 +15,6 @@ import { Team } from './components/Team';
 import { Solutions } from './components/Solutions';
 import { Admin } from './components/Admin';
 import { fetchSiteData, updateSiteData } from './services/api';
-
-export type Page = 'home' | 'about' | 'services' | 'portfolio' | 'team' | 'contact' | 'admin';
 
 export interface Project {
   id: string;
@@ -83,8 +83,6 @@ const initialData: SiteData = {
   ],
   trustedBrands: [
     'FINTECH', 'SNAP PAY', 'IMOS', 'MOE MEDIA', 'SWC GLOBAL', 
-    'DFIT LABS', 'VORTEX AI', 'APEX SYSTEMS',
-    'FINTECH', 'SNAP PAY', 'IMOS', 'MOE MEDIA', 'SWC GLOBAL', 
     'DFIT LABS', 'VORTEX AI', 'APEX SYSTEMS'
   ],
   stats: {
@@ -100,12 +98,13 @@ const initialData: SiteData = {
 };
 
 const App: React.FC = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [currentPage, setCurrentPage] = useState<Page>('home');
   const [siteData, setSiteData] = useState<SiteData>(initialData);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch data from database on mount
+  const location = useLocation();
+  const hideStandardLayout = location.pathname === '/admin';
+
+  // Fetch data on mount
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -113,7 +112,6 @@ const App: React.FC = () => {
         setSiteData(data);
       } catch (error) {
         console.error('Error loading site data:', error);
-        // Keep using initialData if fetch fails
       } finally {
         setIsLoading(false);
       }
@@ -121,13 +119,13 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
-  // Save data to database whenever siteData changes
+  // Save data on change
   useEffect(() => {
     if (!isLoading) {
       const saveData = async () => {
         try {
           await updateSiteData(siteData);
-          console.log('✅ Data saved to database!');
+          console.log('✅ Data saved!');
         } catch (error) {
           console.error('❌ Error saving data:', error);
         }
@@ -136,82 +134,44 @@ const App: React.FC = () => {
     }
   }, [siteData, isLoading]);
 
-  useEffect(() => {
-    // Handle URL path simulation
-    const path = window.location.pathname;
-    if (path === '/admin') {
-      setCurrentPage('admin');
-    }
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage]);
-
-  const renderPage = () => {
-    if (isLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-brand-black">
-          <div className="text-brand-yellow text-2xl font-black animate-pulse">Loading...</div>
-        </div>
-      );
-    }
-
-    switch (currentPage) {
-      case 'home':
-        return (
-          <div className="animate-in fade-in duration-700 overflow-x-hidden w-full">
-            <Hero data={siteData.hero} setPage={setCurrentPage} />
-            <TrustedBy brands={siteData.trustedBrands || []} />
-            <Features />
-            <FeaturedWorks works={siteData.projects} />
-            <FAQ />
-            <Stats stats={siteData.stats || { projects: 150, clients: 85, engagement: 25000 }} />
-            <ContactCTA setPage={setCurrentPage} contact={siteData.contact} />
-          </div>
-        );
-      case 'about':
-        return <About aboutData={siteData.about || { yearsExperience: 5, partnerPrograms: 12, teamImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200' }} />;
-      case 'services':
-        return (
-          <div className="animate-in fade-in duration-700 overflow-x-hidden w-full">
-            <Features />
-            <Stats stats={siteData.stats || { projects: 150, clients: 85, engagement: 25000 }} />
-          </div>
-        );
-      case 'portfolio':
-        return <Solutions works={siteData.projects} />;
-      case 'team':
-        return <Team members={siteData.team} />;
-      case 'contact':
-        return <ContactCTA isFullPage setPage={setCurrentPage} contact={siteData.contact} />;
-      case 'admin':
-        return <Admin siteData={siteData} setSiteData={setSiteData} />;
-      default:
-        return <Hero data={siteData.hero} setPage={setCurrentPage} />;
-    }
-  };
-
-  const isLightMode = ['about', 'portfolio', 'team'].includes(currentPage);
-  const hideStandardLayout = currentPage === 'admin';
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-black">
+        <div className="text-brand-yellow text-2xl font-black animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`min-h-screen selection:bg-brand-yellow selection:text-brand-black overflow-x-hidden ${isLightMode ? 'bg-white' : 'bg-brand-black'}`}>
-      {!hideStandardLayout && (
-        <Navbar scrolled={scrolled} currentPage={currentPage} setPage={setCurrentPage} />
-      )}
+    <div className={`min-h-screen selection:bg-brand-yellow selection:text-brand-black overflow-x-hidden ${['/about','/portfolio','/team'].includes(location.pathname) ? 'bg-white' : 'bg-brand-black'}`}>
+      {!hideStandardLayout && <Navbar />}
       <main className="w-full relative overflow-x-hidden">
-        {renderPage()}
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Hero data={siteData.hero} />
+              <TrustedBy brands={siteData.trustedBrands || []} />
+              <Features />
+              <FeaturedWorks works={siteData.projects} />
+              <FAQ />
+              <Stats stats={siteData.stats || initialData.stats!} />
+              <ContactCTA contact={siteData.contact} />
+            </>
+          }/>
+          <Route path="/about" element={<About aboutData={siteData.about || initialData.about!} />} />
+          <Route path="/services" element={
+            <>
+              <Features />
+              <Stats stats={siteData.stats || initialData.stats!} />
+            </>
+          }/>
+          <Route path="/portfolio" element={<Solutions works={siteData.projects} />} />
+          <Route path="/team" element={<Team members={siteData.team} />} />
+          <Route path="/contact" element={<ContactCTA isFullPage contact={siteData.contact} />} />
+          <Route path="/admin" element={<Admin siteData={siteData} setSiteData={setSiteData} />} />
+        </Routes>
       </main>
-      {!hideStandardLayout && (
-        <Footer setPage={setCurrentPage} />
-      )}
+      {!hideStandardLayout && <Footer />}
     </div>
   );
 };
