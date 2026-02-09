@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface ContactProps {
   isFullPage?: boolean;
-  setPage?: (page: any) => void;
   contact: {
     email: string;
     address: string;
   };
 }
 
-export const ContactCTA: React.FC<ContactProps> = ({ isFullPage = false, setPage, contact }) => {
+export const ContactCTA: React.FC<ContactProps> = ({ isFullPage = false, contact }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -206,7 +207,18 @@ export const ContactCTA: React.FC<ContactProps> = ({ isFullPage = false, setPage
                           required
                         />
                      </div>
-                     
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-4">Email Address</label>
+                        <input 
+                          type="email" 
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-brand-yellow transition-colors" 
+                          placeholder="john@example.com"
+                          required
+                        />
+                     </div>
                   </div>
                   <div className="space-y-2">
                      <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-4">Subject</label>
@@ -260,7 +272,10 @@ export const ContactCTA: React.FC<ContactProps> = ({ isFullPage = false, setPage
             
             <div className="flex flex-wrap items-center justify-center gap-6">
               <button 
-                onClick={() => setPage && setPage('contact')}
+                onClick={() => {
+                  navigate('/contact');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className="glass-button-yellow px-10 py-5 bg-brand-yellow/10 text-brand-yellow rounded-full font-black text-lg hover:bg-brand-yellow hover:text-brand-black transition-all flex items-center gap-3 group border-brand-yellow/30"
               >
                 Contact Us Today

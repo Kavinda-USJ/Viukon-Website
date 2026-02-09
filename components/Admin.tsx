@@ -22,6 +22,17 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editingMember, setEditingMember] = useState<string | null>(null);
 
+  // Project Categories
+  const projectCategories = [
+    'Branding',
+    'Social Media',
+    'Website',
+    'Ad Campaigns',
+    'Videography',
+    'AI Content',
+    'Other'
+  ];
+
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 3000);
@@ -86,12 +97,9 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
     }
   };
 
-  // Stats Section - FIXED to allow empty values, remove leading zeros, and proper updates
+  // Stats Section
   const handleStatsChange = (field: 'projects' | 'clients' | 'engagement', value: string) => {
-    // Only allow digits
     const digitsOnly = value.replace(/\D/g, '');
-    
-    // Convert to number - empty string becomes 0
     const numValue = digitsOnly === '' ? 0 : parseInt(digitsOnly, 10);
     
     setSiteData(prev => ({
@@ -207,6 +215,7 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
   };
 
   const inputStyles = "w-full bg-brand-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/30 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none transition-all";
+  const selectStyles = "w-full bg-brand-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none transition-all appearance-none cursor-pointer";
   const textareaStyles = "w-full bg-brand-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/30 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none transition-all resize-none min-h-[100px]";
   const labelStyles = "block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2 ml-1";
   const saveBtnStyles = "px-6 py-2.5 bg-brand-yellow text-brand-black rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-brand-yellow/90 active:scale-95 transition-all shadow-lg shadow-brand-yellow/20";
@@ -605,13 +614,20 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
                         </div>
                         <div>
                           <label className={labelStyles}>Category</label>
-                          <input 
-                            type="text" 
-                            value={project.category} 
-                            onChange={(e) => updateProject(project.id, 'category', e.target.value)}
-                            className={inputStyles}
-                            placeholder="e.g., Branding, Web Design"
-                          />
+                          <div className="relative">
+                            <select 
+                              value={project.category} 
+                              onChange={(e) => updateProject(project.id, 'category', e.target.value)}
+                              className={selectStyles}
+                            >
+                              {projectCategories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                            </select>
+                            <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                       <div>

@@ -158,7 +158,7 @@ const App: React.FC = () => {
               <ContactCTA contact={siteData.contact} />
             </>
           }/>
-          <Route path="/about" element={<About aboutData={siteData.about || initialData.about!} />} />
+         <Route path="/about" element={<About aboutData={siteData.about || initialData.about!} teamMembers={siteData.team} />} />
           <Route path="/services" element={
             <>
               <Features />
