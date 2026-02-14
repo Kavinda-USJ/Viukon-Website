@@ -44,6 +44,7 @@ export interface SiteData {
   team: TeamMember[];
   contact: {
     email: string;
+    phone: string;   // ← added
     address: string;
   };
   trustedBrands?: string[];
@@ -56,7 +57,6 @@ export interface SiteData {
     yearsExperience: number;
     partnerPrograms: number;
     teamImage: string;
-    // ✅ Order arrays stored here — no backend/DB changes needed
     teamOrder?: string[];
     projectOrder?: string[];
   };
@@ -69,6 +69,7 @@ const initialData: SiteData = {
   },
   contact: {
     email: "hello@viukon.com",
+    phone: "+94 77 812 3732",   // ← added
     address: "32 Curzon St, London"
   },
   projects: [
@@ -103,10 +104,6 @@ const initialData: SiteData = {
   }
 };
 
-// ─── Apply saved order arrays to sort team/projects ───────────────────────────
-// The backend returns rows in DB order (ORDER BY id DESC).
-// We saved the desired order as an array of IDs inside about.teamOrder.
-// This function sorts the arrays to match that saved order.
 const applySavedOrder = (data: SiteData): SiteData => {
   const teamOrder    = data.about?.teamOrder    || [];
   const projectOrder = data.about?.projectOrder || [];
@@ -116,7 +113,6 @@ const applySavedOrder = (data: SiteData): SiteData => {
     return [...items].sort((a, b) => {
       const ai = order.indexOf(a.id);
       const bi = order.indexOf(b.id);
-      // Items not in the order list go to the end
       if (ai === -1) return 1;
       if (bi === -1) return -1;
       return ai - bi;
@@ -125,6 +121,12 @@ const applySavedOrder = (data: SiteData): SiteData => {
 
   return {
     ...data,
+    // Ensure phone exists even if loaded from older backend data without it
+    contact: {
+      email:   data.contact?.email   || '',
+      phone:   data.contact?.phone   || '',
+      address: data.contact?.address || '',
+    },
     team:     sortByOrder(data.team,     teamOrder),
     projects: sortByOrder(data.projects, projectOrder),
   };
@@ -137,17 +139,14 @@ const App: React.FC = () => {
   const location = useLocation();
   const hideStandardLayout = location.pathname === '/admin';
 
-  // Scroll to top on every page/tab change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Fetch data on mount — apply saved order immediately after loading
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await fetchSiteData();
-        // Apply the saved order arrays so team/projects render in correct order
         setSiteData(applySavedOrder(data));
       } catch (error) {
         console.error('Error loading site data:', error);
@@ -158,28 +157,22 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
-  // When admin reorders, keep teamOrder/projectOrder in sync with the array positions
-  // This runs whenever siteData changes and captures the current order as ID arrays
   useEffect(() => {
     if (isLoading) return;
-
     setSiteData(prev => ({
       ...prev,
       about: {
         ...(prev.about || initialData.about!),
-        // Save the current array order as ID lists inside `about`
         teamOrder:    prev.team.map(m => m.id),
         projectOrder: prev.projects.map(p => p.id),
       }
     }));
   }, [
-    // Only re-run when the actual order of IDs changes, not on every siteData update
     siteData.team.map(m => m.id).join(','),
     siteData.projects.map(p => p.id).join(','),
     isLoading,
   ]);
 
-  // Save data to backend on change
   useEffect(() => {
     if (!isLoading) {
       const saveData = async () => {
@@ -228,8 +221,6 @@ const App: React.FC = () => {
       </main>
       {!hideStandardLayout && <Footer />}
 
-      {/* ── WhatsApp Floating Button ── */}
-      {/* Hidden on /admin, always fixed bottom-left on every other page */}
       {!hideStandardLayout && (
         <a
           href="https://wa.me/94778123732"
@@ -238,16 +229,11 @@ const App: React.FC = () => {
           aria-label="Chat with us on WhatsApp"
           className="fixed bottom-6 right-6 z-50 group flex items-center gap-3"
         >
-          {/* Tooltip label — appears to the left of the button */}
           <span className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 bg-white text-[#128C7E] text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap pointer-events-none order-first">
             Chat with us
           </span>
-
-          {/* Button */}
           <div className="relative w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(37,211,102,0.5)] hover:shadow-[0_4px_30px_rgba(37,211,102,0.7)] hover:scale-110 active:scale-95 transition-all duration-300">
-            {/* Pulse ring */}
             <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-25" />
-            {/* WhatsApp SVG icon */}
             <svg viewBox="0 0 32 32" className="w-7 h-7 fill-white relative z-10" xmlns="http://www.w3.org/2000/svg">
               <path d="M16.003 2C8.28 2 2 8.28 2 16.003c0 2.478.65 4.897 1.885 7.02L2 30l7.184-1.862A13.94 13.94 0 0016.003 30C23.72 30 30 23.72 30 16.003 30 8.28 23.72 2 16.003 2zm0 25.474a11.53 11.53 0 01-5.886-1.607l-.422-.25-4.265 1.106 1.133-4.148-.276-.435A11.474 11.474 0 014.526 16c0-6.326 5.15-11.474 11.477-11.474S27.474 9.674 27.474 16c0 6.327-5.148 11.474-11.471 11.474zm6.3-8.596c-.346-.173-2.044-1.007-2.36-1.122-.317-.115-.548-.173-.778.173-.23.346-.894 1.122-1.095 1.353-.202.23-.403.26-.75.087-.345-.173-1.458-.537-2.777-1.713-1.026-.916-1.72-2.047-1.921-2.393-.202-.346-.022-.533.151-.705.155-.155.346-.403.519-.605.173-.202.23-.346.346-.577.115-.23.058-.433-.029-.606-.087-.172-.778-1.873-1.066-2.564-.28-.673-.566-.582-.778-.593l-.663-.011c-.23 0-.605.086-.922.433-.317.346-1.21 1.181-1.21 2.88 0 1.7 1.239 3.342 1.411 3.573.173.23 2.44 3.726 5.912 5.225.826.357 1.47.57 1.972.729.829.264 1.584.227 2.18.138.665-.1 2.044-.835 2.333-1.64.288-.806.288-1.497.202-1.641-.086-.144-.317-.23-.663-.403z"/>
             </svg>

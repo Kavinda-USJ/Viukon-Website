@@ -586,24 +586,56 @@ export const Admin: React.FC<AdminProps> = ({ siteData, setSiteData }) => {
             )}
 
             {/* ── CONTACT ── */}
-            {activeTab === 'contact' && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <h3 className="text-2xl font-black">Contact Information</h3>
-                <div className="space-y-6">
-                  <div>
-                    <label className={lbl}>Public Email Address</label>
-                    <input type="email" value={siteData.contact.email} onChange={e => setSiteData(prev => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))} className={inp} placeholder="hello@company.com" />
-                  </div>
-                  <div>
-                    <label className={lbl}>Office Address</label>
-                    <input type="text" value={siteData.contact.address} onChange={e => setSiteData(prev => ({ ...prev, contact: { ...prev.contact, address: e.target.value } }))} className={inp} placeholder="123 Main Street, City, Country" />
-                  </div>
-                  <div className="flex justify-end pt-4 border-t border-white/5">
-                    <button onClick={() => showNotification('success', 'Contact information saved')} className={saveBtn}>Save Changes</button>
-                  </div>
-                </div>
-              </div>
-            )}
+           { activeTab === 'contact' && (
+  <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <h3 className="text-2xl font-black">Contact Information</h3>
+    <div className="space-y-6">
+
+      <div>
+        <label className={lbl}>Public Email Address</label>
+        <input
+          type="email"
+          value={siteData.contact.email}
+          onChange={e => setSiteData(prev => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))}
+          className={inp}
+          placeholder="hello@company.com"
+        />
+      </div>
+
+      <div>
+        <label className={lbl}>Phone Number</label>
+        <input
+          type="tel"
+          value={siteData.contact.phone}
+          onChange={e => setSiteData(prev => ({ ...prev, contact: { ...prev.contact, phone: e.target.value } }))}
+          className={inp}
+          placeholder="+94 77 812 3732"
+        />
+      </div>
+
+      <div>
+        <label className={lbl}>Office Address</label>
+        <input
+          type="text"
+          value={siteData.contact.address}
+          onChange={e => setSiteData(prev => ({ ...prev, contact: { ...prev.contact, address: e.target.value } }))}
+          className={inp}
+          placeholder="123 Main Street, City, Country"
+        />
+      </div>
+
+      <div className="flex justify-end pt-4 border-t border-white/5">
+        <button
+          onClick={() => showNotification('success', 'Contact information saved')}
+          className={saveBtn}
+        >
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
           </main>
         </div>
