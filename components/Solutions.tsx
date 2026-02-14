@@ -7,6 +7,16 @@ interface SolutionsProps {
 
 export const Solutions: React.FC<SolutionsProps> = ({ works }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  const categories = ['All', 'Social Media', 'Website', 'Ad Campaigns', 'Videography', 'AI Content', 'Branding'];
+
+  // Filter projects based on selected category
+  const filteredWorks = selectedCategory === 'All' 
+    ? works 
+    : works.filter(project => 
+        project.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
 
   // Disable body scroll when modal is open
   useEffect(() => {
@@ -30,8 +40,26 @@ export const Solutions: React.FC<SolutionsProps> = ({ works }) => {
           </h2>
         </div>
 
+        {/* Category Filter */}
+        <div className="mb-12 flex flex-wrap gap-3">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-3 rounded-full font-bold uppercase text-xs tracking-wider transition-all duration-300 ${
+                selectedCategory === category
+                  ? 'bg-brand-yellow text-brand-black shadow-lg scale-105'
+                  : 'bg-gray-100 text-brand-black/60 hover:bg-gray-200 hover:text-brand-black border border-black/5'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {works.map((project) => (
+          {filteredWorks.map((project) => (
             <div key={project.id} className="group">
               <div 
                 className="aspect-[4/5] rounded-2xl overflow-hidden mb-6 bg-gray-100 cursor-pointer border border-black/5"
@@ -40,7 +68,7 @@ export const Solutions: React.FC<SolutionsProps> = ({ works }) => {
                 <img 
                   src={project.img} 
                   alt={project.title} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
                 />
               </div>
 
@@ -50,8 +78,11 @@ export const Solutions: React.FC<SolutionsProps> = ({ works }) => {
                   <p className="text-brand-black/30 text-xs font-bold uppercase mt-1">{project.category}</p>
                 </div>
                 
-                {/* Arrow button - ALWAYS shows */}
-                <div className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center hover:bg-brand-yellow hover:border-brand-yellow transition-all cursor-pointer group/btn">
+                {/* Arrow button */}
+                <div 
+                  className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center hover:bg-brand-yellow hover:border-brand-yellow transition-all cursor-pointer group/btn"
+                  onClick={() => setSelectedProject(project)}
+                >
                   <svg 
                     className="w-5 h-5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" 
                     fill="none" 
@@ -65,15 +96,21 @@ export const Solutions: React.FC<SolutionsProps> = ({ works }) => {
             </div>
           ))}
         </div>
+
+        {/* No results message */}
+        {filteredWorks.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-brand-black/40 text-lg font-bold">No projects found in this category</p>
+          </div>
+        )}
       </div>
 
-      {/* Modal with FIXED SCROLL */}
+      {/* Modal */}
       {selectedProject && (
         <div 
           className="fixed inset-0 z-[100] bg-brand-black/95 backdrop-blur-xl"
           style={{ overflow: 'hidden' }}
         >
-          {/* Scrollable container */}
           <div 
             className="fixed inset-0 overflow-y-auto"
             onClick={() => setSelectedProject(null)}

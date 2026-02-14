@@ -25,8 +25,6 @@ export const About: React.FC<AboutProps> = ({ aboutData, teamMembers }) => {
             <p className="text-xl text-brand-black/60 leading-relaxed max-w-lg font-medium">
               Founded in Sri Lanka, Viukon was born from a simple realization: the digital landscape isn't just about presence—it's about dominance through data and design.
             </p>
-            
-            {/* Stats - Using data from admin panel */}
             <div className="flex gap-12 pt-6">
               <div>
                 <div className="text-4xl font-black text-brand-black">{aboutData.yearsExperience || 5}+</div>
@@ -41,9 +39,9 @@ export const About: React.FC<AboutProps> = ({ aboutData, teamMembers }) => {
 
           <div className="relative">
             <div className="aspect-square bg-brand-gray rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src={aboutData.teamImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200'} 
-                className="w-full h-full object-cover" 
+              <img
+                src={aboutData.teamImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200'}
+                className="w-full h-full object-cover"
                 alt="Viukon Team"
               />
             </div>
@@ -70,7 +68,7 @@ export const About: React.FC<AboutProps> = ({ aboutData, teamMembers }) => {
           </div>
         </div>
 
-        {/* Team Members Section */}
+        {/* Team Members — rendered in the exact order from siteData.team (Admin controls order) */}
         <div className="mt-32">
           <div className="text-center mb-24 space-y-4">
             <span className="text-brand-yellow font-black uppercase tracking-[0.3em] text-xs">The Minds</span>
@@ -85,16 +83,14 @@ export const About: React.FC<AboutProps> = ({ aboutData, teamMembers }) => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
             {teamMembers.map((member) => (
               <div key={member.id} className="group flex flex-col items-center">
-                {/* Round Image Container */}
                 <div className="w-40 h-40 rounded-full overflow-hidden mb-6 border-4 border-gray-100 group-hover:border-brand-yellow/30 transition-all duration-500 shadow-lg group-hover:shadow-2xl group-hover:shadow-brand-yellow/20 relative bg-gray-50">
-                <img 
-  src={member.img} 
-  alt={member.name} 
-  className="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-/>
+                  <img
+                    src={member.img}
+                    alt={member.name}
+                    className="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-yellow/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
-                {/* Member Info */}
                 <div className="text-center">
                   <h4 className="text-lg font-black text-brand-black group-hover:text-brand-yellow transition-colors">{member.name}</h4>
                   <p className="text-brand-black/50 font-bold text-[10px] uppercase tracking-widest mt-1">{member.role}</p>
